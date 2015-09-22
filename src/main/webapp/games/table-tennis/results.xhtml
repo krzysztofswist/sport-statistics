@@ -11,12 +11,12 @@
 		<h:form id="resultsForm">
 			<p:growl id="growlId" showDetail="false"></p:growl>
 
-			<h1>Results for Table Tennis match</h1>
+			<h1>Results for Table Tennis matches</h1>
 			<p:dataTable id="resultsTable" var="disp" value="#{results.results}"
 				resizableColumns="false" emptyMessage="NO RESULTS FOUND">
 				<p:column headerText="Date">
 					<p:outputLabel value="#{disp.date}">
-						<f:convertDateTime pattern="MM-dd-yyyy hh:mm" />
+						<f:convertDateTime pattern="MM-dd-yyyy HH:mm" />
 					</p:outputLabel>
 				</p:column>
 				<p:column headerText="Match">

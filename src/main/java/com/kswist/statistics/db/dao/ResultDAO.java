@@ -31,7 +31,7 @@ public class ResultDAO {
 		Root<Result> result = cq.from(Result.class);
 
 		cq.select(result);
-		cq.orderBy(cb.asc(result.<Date>get("date")));
+		cq.orderBy(cb.desc(result.<Date>get("date")));
 		return em.createQuery(cq).getResultList();
 	}
 	

@@ -25,11 +25,19 @@
 		<h1 class="title">Sport statistics</h1>
 
 		<p:layoutUnit position="center" id="content">
-		<a href="/sport-statistics/">Home</a> 
-        		<a href="/sport-statistics/games/table-tennis/add-result.jsf">Add Result</a>
-        		<a href="/sport-statistics/games/table-tennis/results.jsf">Results</a>
-        		<a href="/sport-statistics/games/table-tennis/ranking.jsf">Ranking</a>
+			<p:megaMenu>
+				<p:submenu label="Sports">
+					<p:column><p:submenu label="Table Tennis">
+					<p:menuitem  value="Add Result" url="/games/table-tennis/add-result.jsf"/>
+					<p:menuitem  value="Results" url="/games/table-tennis/results.jsf"/>
+					<p:menuitem  value="Ranking" url="/games/table-tennis/ranking.jsf"/>
+					</p:submenu></p:column>
+				</p:submenu>
+			</p:megaMenu>
+			
 			<ui:insert name="content" />
+
+			
 		</p:layoutUnit>
 
 
