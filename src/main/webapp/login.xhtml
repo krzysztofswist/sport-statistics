@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/templates/authorization.xhtml">
+
+	<ui:define name="content">
+		<h:form>
+			<h:panelGroup layout="block" styleClass="login-panel">
+
+				<h:panelGrid id="grid" columns="2" cellpadding="5">
+					<p:outputLabel for="j_username" styleClass="login-label"
+						value="Login:" />
+					<p:inputText id="j_username" value="#{authBean.user}" />
+					<p:outputLabel for="j_password" styleClass="login-label"
+						value="Password:" />
+					<p:password id="j_password" value="#{authBean.password}" />
+
+				</h:panelGrid>
+				<h:panelGroup layout="block" styleClass="login-button">
+					<p:commandButton value="Login" action="#{authBean.login()}"
+						update=":messages" />
+				</h:panelGroup>
+			</h:panelGroup>
+		</h:form>
+	</ui:define>
+
+</ui:composition>

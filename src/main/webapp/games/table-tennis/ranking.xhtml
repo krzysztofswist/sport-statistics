@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/templates/default.xhtml">
+	<ui:define name="content">
+		<f:event type="preRenderView" listener="#{results.init()}" />
+
+		<h:form id="rankingForm">
+			<p:growl id="growlId" showDetail="false"></p:growl>
+
+			<h1>Ranking</h1>
+			<p:dataTable id="rankingTable" var="disp" value="#{results.ranking}"
+				resizableColumns="false" emptyMessage="NO RESULTS FOUND">
+				<p:column headerText="User">
+					<p:outputLabel value="#{disp.key.firstName} #{disp.key.lastName}" />
+				</p:column>
+				<p:column headerText="Ranking">
+					<p:outputLabel value="#{disp.value}" />
+				</p:column>
+
+
+			</p:dataTable>
+
+
+		</h:form>
+
+	</ui:define>
+</ui:composition>

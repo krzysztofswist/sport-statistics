@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/templates/default.xhtml">
+	<ui:define name="content">
+
+		<h:form id="tt">
+			<h1>Add Result for Table Tennis match</h1>
+
+			<p:growl id="growlId" showDetail="false"></p:growl>
+
+			<h3>Select opponent:</h3>
+			<h:panelGrid columns="2">
+				<p:selectOneRadio id="opponent" value="#{tableTennis.opponent}" converter="#{userConverter}"
+					required="true" requiredMessage="You must select opponent!"
+					layout="grid" columns="3">
+					<f:selectItems id="selectOpponent" value="#{tableTennis.users}" var="usr"
+						itemLabel="#{usr.firstName} #{usr.lastName}" itemValue="#{usr}" />
+				</p:selectOneRadio>
+			</h:panelGrid>
+			<h3>Select score:</h3>
+			<p:selectOneButton value="#{tableTennis.score}" required="true"
+				requiredMessage="You must select score!">
+				<f:selectItems value="#{tableTennis.scores}" var="s"
+					itemLabel="#{s.label}" itemValue="#{s}" />
+			</p:selectOneButton>
+
+			<h3>Submit</h3>
+			<p:commandButton value="Submit" type="submit" action="#{tableTennis.saveResult()}"
+				update=":tt"/>
+
+		</h:form>
+
+	</ui:define>
+</ui:composition>

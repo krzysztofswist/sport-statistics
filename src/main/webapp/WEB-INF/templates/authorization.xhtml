@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<title>Sport statistics</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<f:facet name="first">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta content="text/html; charset=UTF-8" http-equiv="content-type" />
+	</f:facet>
+	<link rel="shortcut icon" type="image/x-icon"
+		href="#{resource['img/favicon.ico']}" />
+	<link rel="icon" type="image/x-icon"
+		href="#{resource['img/favicon.ico']}" />
+	<h:outputStylesheet name="css/ss.css" />
+</h:head>
+<h:body>
+	<p:layout fullPage="true" resizeTitle="resize">
+
+		<p:layoutUnit id="content" position="center" resizable="false"
+			layout="block">
+
+			<p:messages id="messages" showDetail="true" closable="true"
+				for="message" />
+			<ui:insert name="content"/>
+
+		</p:layoutUnit>
+
+		<p:layoutUnit id="footer" position="south" resizable="true"
+			layout="block">
+			<p>Sport Statistics by Krzysztof Swist 2015</p>
+		</p:layoutUnit>
+
+	</p:layout>
+
+
+</h:body>
+</html>

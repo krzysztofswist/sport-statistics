@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/templates/default.xhtml">
+	<ui:define name="content">
+		<f:event type="preRenderView" listener="#{results.init()}" />
+
+		<h:form id="resultsForm">
+			<p:growl id="growlId" showDetail="false"></p:growl>
+
+			<h1>Results for Table Tennis match</h1>
+			<p:dataTable id="resultsTable" var="disp" value="#{results.results}"
+				resizableColumns="false" emptyMessage="NO RESULTS FOUND">
+				<p:column headerText="Date">
+					<p:outputLabel value="#{disp.date}">
+						<f:convertDateTime pattern="MM-dd-yyyy hh:mm" />
+					</p:outputLabel>
+				</p:column>
+				<p:column headerText="Match">
+					<p:outputLabel
+						value="#{disp.user.firstName} #{disp.user.lastName} vs #{disp.opponent.firstName} #{disp.opponent.lastName} "></p:outputLabel>
+				</p:column>
+				<p:column headerText="Result">
+					<p:outputLabel value="#{disp.userPoints}:#{disp.opponentPoints} "></p:outputLabel>
+				</p:column>
+
+				<p:column>
+					<p:commandButton value="Confirm" action="#{results.confirm(disp)}"
+						rendered="#{results.renderConfirmed(disp) }" update=":resultsForm" />
+				</p:column>
+				<p:column>
+					<p:commandButton value="Delete" action="#{results.delete(disp)}"
+						rendered="#{!disp.confirmed }" update=":resultsForm" />
+				</p:column>
+
+></p:dataTable>
+
+
+		</h:form>
+
+	</ui:define>
+</ui:composition>
