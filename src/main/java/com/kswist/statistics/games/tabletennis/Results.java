@@ -47,7 +47,7 @@ public class Results implements Serializable {
 	@PostConstruct
 	public void init() {
 		user = userDAO.getByLogin(authBean.getUser());
-		results = resultDAO.getAll();
+		results = resultDAO.getAllDesc();
 	}
 
 	public List<Result> getResults() {
@@ -88,9 +88,10 @@ public class Results implements Serializable {
 	}
 
 	public List<Map.Entry<User, Integer>> getRanking() {
-		Map<User, Integer> rankingMap = calculateRanking(results);
+		Map<User, Integer> rankingMap = calculateRanking(resultDAO.getAllAsc());
 		Set<Map.Entry<User, Integer>> rankingSet = rankingMap.entrySet();
-		List<Map.Entry<User, Integer>> list= new ArrayList<Map.Entry<User, Integer>>(rankingSet);
+		List<Map.Entry<User, Integer>> list = new ArrayList<Map.Entry<User, Integer>>(
+				rankingSet);
 		Collections.sort(list, new ValueComparator<User, Integer>());
 		return list;
 	}
@@ -109,20 +110,23 @@ public class Results implements Serializable {
 			int userElo = eloMap.get(user);
 			int opponentElo = eloMap.get(opponent);
 			double userES = calculateExpectedScore(userElo, opponentElo);
-			logger.debug(user.getLogin() + " ES: " + userES);
 			double opponentES = calculateExpectedScore(opponentElo, userElo);
-			logger.debug(opponent.getLogin() + " ES: " + opponentES);
-
-			int userEloNew = (int) (userElo
-					+ K * ((result.getUserPoints() > result.getOpponentPoints()
-							? 1 : 0) - userES));
-			logger.debug(user.getLogin() + " ELO: " + userEloNew);
+			int userS = (result.getUserPoints() > result.getOpponentPoints())
+					? 1 : 0;
+			int opponentS = (result.getOpponentPoints() > result
+					.getUserPoints()) ? 1 : 0;
+			int userEloNew = (int) (userElo + K * (userS - userES));
 			int opponentEloNew = (int) (opponentElo
-					+ K * ((result.getOpponentPoints() > result.getUserPoints()
-							? 1 : 0) - opponentES));
-			logger.debug(opponent.getLogin() + " ELO: " + opponentEloNew);
+					+ K * (opponentS - opponentES));
 			eloMap.put(user, userEloNew);
 			eloMap.put(opponent, opponentEloNew);
+			logger.debug(user.getLogin() + " ES: " + userES);
+			logger.debug(user.getLogin() + " S: " + userS);
+			logger.debug(user.getLogin() + " ELO: " + userEloNew);
+			logger.debug(opponent.getLogin() + " ES: " + opponentES);
+			logger.debug(opponent.getLogin() + " S: " + opponentS);
+			logger.debug(opponent.getLogin() + " ELO: " + opponentEloNew);
+
 		}
 		return eloMap;
 
