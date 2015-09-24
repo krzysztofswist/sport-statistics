@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-Built-By: kswist
-Build-Jdk: 1.8.0_60
-Created-By: Maven Integration for Eclipse
-RAA-Version: 0.0.1-SNAPSHOT
-
