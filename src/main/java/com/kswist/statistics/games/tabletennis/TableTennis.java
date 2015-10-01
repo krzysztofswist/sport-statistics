@@ -16,6 +16,7 @@ import com.kswist.statistics.db.dao.UserDAO;
 import com.kswist.statistics.db.entities.Result;
 import com.kswist.statistics.db.entities.User;
 import com.kswist.statistics.security.AuthorizationBean;
+import com.kswist.statistics.utils.MailSender;
 import com.kswist.statistics.utils.Score;
 import com.kswist.statistics.utils.WebMessage;
 
@@ -35,6 +36,9 @@ public class TableTennis implements Serializable {
 
 	@Inject
 	AuthorizationBean authBean;
+
+	@Inject
+	MailSender mailSender;
 
 	@Inject
 	UserDAO userDAO;
@@ -77,6 +81,15 @@ public class TableTennis implements Serializable {
 			result.setConfirmed(false);
 
 			resultDAO.save(result);
+			String subject = "There is a result waiting for you to confirm from User: "
+					+ user.getFirstName() + " " + user.getLastName();
+			String body = "Dear Mr/Ms " + opponent.getFirstName() + " "
+					+ opponent.getLastName() + ",</BR></BR>"
+					+ "There is a result waiting for you to confirm from user: "
+					+ user.getFirstName() + " " + user.getLastName() + "</BR>"
+					+ "You can confirm or delete it at "
+					+ "http://plbydn0h334352.pl.alcatel-lucent.com:8081/sport-statistics/ </BR></BR> Best regards,</BR> Sport statistics mail deamon ;-)";
+			mailSender.send(user.getEmail(), opponent.getEmail(), subject, body);
 			String msg = "Result saved!";
 			message.info(msg, "message");
 			logger.debug(msg);
@@ -106,7 +119,5 @@ public class TableTennis implements Serializable {
 	public void setUser(User user) {
 		this.user = user;
 	}
-
-	
 
 }

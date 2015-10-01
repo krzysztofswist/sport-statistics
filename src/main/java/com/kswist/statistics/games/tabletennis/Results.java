@@ -2,8 +2,10 @@ package com.kswist.statistics.games.tabletennis;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +13,7 @@ import java.util.TreeMap;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
+import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -45,6 +48,9 @@ public class Results implements Serializable {
 
 	@Inject
 	ResultDAO resultDAO;
+	
+	@Inject
+	FacesContext context;
 
 	@PostConstruct
 	public void init() {
@@ -52,7 +58,6 @@ public class Results implements Serializable {
 		results = resultDAO.getAllDesc();
 		users = userDAO.getAll();
 		calculateRanking(resultDAO.getAllAsc());
-
 	}
 
 	public List<Result> getResults() {
@@ -100,49 +105,46 @@ public class Results implements Serializable {
 		return false;
 	}
 
-	public List<Map.Entry<User, Integer>> getRanking() {
-		// SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		// Map<User, Integer> rankingMap = eloDaily.get(sdf.format(new Date()));
-		// Set<Map.Entry<User, Integer>> rankingSet = rankingMap.entrySet();
-		// List<Map.Entry<User, Integer>> list = new ArrayList<Map.Entry<User,
-		// Integer>>();
-		// for(User user:users){
-		// Map<>new HashMap
-		// }
-		// Collections.sort(list, new ValueComparator<User, Integer>());
-		return null;
-	}
-
 	private void calculateRanking(List<Result> results) {
 		prepareInitialElo();
 		int K = 32;
-		for (Result result : results) {
-			String date = formatDate(result.getDate());
-			handleDate(result.getDate());
-			logger.debug(date);
-			User user = result.getUser();
-			User opponent = result.getOpponent();
-			Map<String, Integer> userMap = eloDaily.get(user);
-			Map<String, Integer> opponentMap = eloDaily.get(opponent);
-			int userElo = userMap.get(date);
-			int opponentElo = opponentMap.get(date);
-			double userES = calculateExpectedScore(userElo, opponentElo);
-			double opponentES = calculateExpectedScore(opponentElo, userElo);
-			int userS = (result.getUserPoints() > result.getOpponentPoints())
-					? 1 : 0;
-			int opponentS = (result.getOpponentPoints() > result
-					.getUserPoints()) ? 1 : 0;
-			int userEloNew = (int) (userElo + K * (userS - userES));
-			int opponentEloNew = (int) (opponentElo
-					+ K * (opponentS - opponentES));
-			userMap.put(date, userEloNew);
-			opponentMap.put(date, opponentEloNew);
-			logger.debug(user.getLogin() + " ES: " + userES);
-			logger.debug(user.getLogin() + " S: " + userS);
-			logger.debug(user.getLogin() + " ELO: " + userEloNew);
-			logger.debug(opponent.getLogin() + " ES: " + opponentES);
-			logger.debug(opponent.getLogin() + " S: " + opponentS);
-			logger.debug(opponent.getLogin() + " ELO: " + opponentEloNew);
+		Calendar start = Calendar.getInstance();
+		start.setTime(results.get(0).getDate());
+		Calendar end = Calendar.getInstance();
+		end.setTime(new Date());
+		end.add(Calendar.DATE, 1);
+
+		for (Date d = start.getTime(); start.before(end); start
+				.add(Calendar.DATE, 1), d = start.getTime()) {
+			handleDate(d);
+			for (Result result : getResultsForDate(d)) {
+				String date = formatDate(result.getDate());
+				logger.debug(date);
+				User user = result.getUser();
+				User opponent = result.getOpponent();
+				Map<String, Integer> userMap = eloDaily.get(user);
+				Map<String, Integer> opponentMap = eloDaily.get(opponent);
+				int userElo = userMap.get(date);
+				int opponentElo = opponentMap.get(date);
+				double userES = calculateExpectedScore(userElo, opponentElo);
+				double opponentES = calculateExpectedScore(opponentElo,
+						userElo);
+				int userS = (result.getUserPoints() > result
+						.getOpponentPoints()) ? 1 : 0;
+				int opponentS = (result.getOpponentPoints() > result
+						.getUserPoints()) ? 1 : 0;
+				int userEloNew = (int) (userElo + K * (userS - userES));
+				int opponentEloNew = (int) (opponentElo
+						+ K * (opponentS - opponentES));
+				userMap.put(date, userEloNew);
+				opponentMap.put(date, opponentEloNew);
+				logger.debug(user.getLogin() + " ES: " + userES);
+				logger.debug(user.getLogin() + " S: " + userS);
+				logger.debug(user.getLogin() + " ELO: " + userEloNew);
+				logger.debug(opponent.getLogin() + " ES: " + opponentES);
+				logger.debug(opponent.getLogin() + " S: " + opponentS);
+				logger.debug(opponent.getLogin() + " ELO: " + opponentEloNew);
+			}
 		}
 
 	}
@@ -185,6 +187,73 @@ public class Results implements Serializable {
 
 	private double calculateExpectedScore(int userElo, int opponentElo) {
 		return 1.0 / (1.0 + Math.pow(10, (opponentElo - userElo) / 400.0));
+	}
+
+	private List<Result> getResultsForDate(Date date) {
+		List<Result> resultsForDate = new ArrayList<Result>();
+		Calendar requestedDay = Calendar.getInstance();
+		requestedDay.setTime(date);
+		requestedDay.set(Calendar.HOUR_OF_DAY, 0);
+		requestedDay.set(Calendar.MINUTE, 0);
+		requestedDay.set(Calendar.SECOND, 0);
+		requestedDay.set(Calendar.MILLISECOND, 0);
+		Calendar resultDay = Calendar.getInstance();
+
+		for (Result result : results) {
+			resultDay.setTime(result.getDate());
+			resultDay.set(Calendar.HOUR_OF_DAY, 0);
+			resultDay.set(Calendar.MINUTE, 0);
+			resultDay.set(Calendar.SECOND, 0);
+			resultDay.set(Calendar.MILLISECOND, 0);
+			logger.debug("Requested date: " + requestedDay.getTime());
+			logger.debug("Result date: " + resultDay.getTime());
+			if (requestedDay.getTime().equals(resultDay.getTime())) {
+				logger.debug(resultDay.getTime() + "equal to "
+						+ requestedDay.getTime());
+				resultsForDate.add(result);
+			}
+		}
+		return resultsForDate;
+	}
+
+	private Map<User, List<Result>> getResultsByUsers() {
+		Map<User, List<Result>> resultsMap = new HashMap<User, List<Result>>();
+		for (Result result : results) {
+			if (resultsMap.get(result.getUser()) == null) {
+				List<Result> userResults = new ArrayList<Result>();
+				userResults.add(result);
+				resultsMap.put(result.getUser(), userResults);
+			} else {
+				resultsMap.get(result.getUser()).add(result);
+			}
+			if (resultsMap.get(result.getOpponent()) == null) {
+				List<Result> userResults = new ArrayList<Result>();
+				addCorrectResult(userResults, result);
+				resultsMap.put(result.getOpponent(), userResults);
+			} else {
+				addCorrectResult(resultsMap.get(result.getOpponent()), result);
+			}
+		}
+		return resultsMap;
+	}
+
+	private void addCorrectResult(List<Result> list, Result result) {
+		Result newResult = new Result();
+		newResult.setConfirmed(result.isConfirmed());
+		newResult.setDate(result.getDate());
+		newResult.setOpponent(result.getUser());
+		newResult.setOpponentPoints(result.getUserPoints());
+		newResult.setResultId(result.getResultId());
+		newResult.setUser(result.getOpponent());
+		newResult.setUserConfirmed(result.getUserConfirmed());
+		newResult.setUserPoints(result.getOpponentPoints());
+		list.add(newResult);
+	}
+	
+	public List<Result> getResultsByUser(){
+		String login = context.getExternalContext().getRequestParameterMap().get("login");
+		User user=userDAO.getByLogin(login);
+		return getResultsByUsers().get(user);
 	}
 
 }
