@@ -6,10 +6,10 @@
 	xmlns:p="http://primefaces.org/ui"
 	template="/WEB-INF/templates/default.xhtml">
 	<ui:define name="content">
-		<f:event type="preRenderView" listener="#{results.init()}" />
 
 		<h:form id="resultsForUserForm">
-			<p:dataTable id="resultsTable" var="disp" value="#{results.getResultsByUser()}"
+			<p:dataTable id="resultsForUserTable" var="disp"
+				value="#{resultsForUser.getResultsByUser()}"
 				resizableColumns="false" emptyMessage="NO RESULTS FOUND">
 				<p:column headerText="Date">
 					<p:outputLabel value="#{disp.date}">
@@ -17,20 +17,15 @@
 					</p:outputLabel>
 				</p:column>
 				<p:column headerText="Match">
-					<p:outputLabel
-						value="#{disp.user.firstName} #{disp.user.lastName} vs #{disp.opponent.firstName} #{disp.opponent.lastName} "></p:outputLabel>
+					<h:link value="#{disp.user.firstName} #{disp.user.lastName}"
+						outcome="/games/table-tennis/results-for-user.jsf?login=#{disp.user.login}" />
+					vs
+					<h:link
+						value="#{disp.opponent.firstName} #{disp.opponent.lastName}"
+						outcome="/games/table-tennis/results-for-user.jsf?login=#{disp.opponent.login}" />
 				</p:column>
 				<p:column headerText="Result">
 					<p:outputLabel value="#{disp.userPoints}:#{disp.opponentPoints} "></p:outputLabel>
-				</p:column>
-
-				<p:column>
-					<p:commandButton value="Confirm" action="#{results.confirm(disp)}"
-						rendered="#{results.renderConfirmed(disp) }" update=":resultsForm" />
-				</p:column>
-				<p:column>
-					<p:commandButton value="Delete" action="#{results.delete(disp)}"
-						rendered="#{!disp.confirmed }" update=":resultsForm" />
 				</p:column>
 
 ></p:dataTable>

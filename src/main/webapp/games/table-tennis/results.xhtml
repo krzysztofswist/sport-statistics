@@ -20,8 +20,12 @@
 					</p:outputLabel>
 				</p:column>
 				<p:column headerText="Match">
-					<p:outputLabel
-						value="#{disp.user.firstName} #{disp.user.lastName} vs #{disp.opponent.firstName} #{disp.opponent.lastName} "></p:outputLabel>
+					<h:link value="#{disp.user.firstName} #{disp.user.lastName}"
+						outcome="/games/table-tennis/results-for-user.jsf?login=#{disp.user.login}" />
+					vs
+					<h:link
+						value="#{disp.opponent.firstName} #{disp.opponent.lastName}"
+						outcome="/games/table-tennis/results-for-user.jsf?login=#{disp.opponent.login}" />
 				</p:column>
 				<p:column headerText="Result">
 					<p:outputLabel value="#{disp.userPoints}:#{disp.opponentPoints} "></p:outputLabel>

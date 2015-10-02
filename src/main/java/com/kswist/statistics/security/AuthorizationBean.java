@@ -38,6 +38,15 @@ public class AuthorizationBean implements Serializable {
 
 	private String user;
 	private String password;
+	private User dbUser;
+
+	public User getDbUser() {
+		return dbUser;
+	}
+
+	public void setDbUser(User dbUser) {
+		this.dbUser = dbUser;
+	}
 
 	@RequestScoped
 	public String getUser() {
@@ -58,14 +67,14 @@ public class AuthorizationBean implements Serializable {
 		this.password = password;
 	}
 
-	public void login() throws NoSuchAlgorithmException,
-			UnsupportedEncodingException {
-		User dbUser = userDAO.getByLogin(user);
-		session = ((HttpSession) facesContext
-				.getExternalContext().getSession(false));
+	public void login()
+			throws NoSuchAlgorithmException, UnsupportedEncodingException {
+		dbUser = userDAO.getByLogin(user);
+		session = ((HttpSession) facesContext.getExternalContext()
+				.getSession(false));
 		if (dbUser != null && password != null
 				&& SHA1(password).equals(dbUser.getPasswordHash())) {
-			
+
 			session.setAttribute("USER", user);
 
 			try {
@@ -80,7 +89,8 @@ public class AuthorizationBean implements Serializable {
 				logger.errorv("Can't redirect to login page", ioe);
 			}
 		} else {
-			webMessage.error("Invalid Login/Password combination or user has no access to application");
+			webMessage.error(
+					"Invalid Login/Password combination or user has no access to application");
 		}
 	}
 
@@ -100,8 +110,8 @@ public class AuthorizationBean implements Serializable {
 		return buf.toString();
 	}
 
-	public String SHA1(String text) throws NoSuchAlgorithmException,
-			UnsupportedEncodingException {
+	public String SHA1(String text)
+			throws NoSuchAlgorithmException, UnsupportedEncodingException {
 		MessageDigest md = MessageDigest.getInstance("SHA-1");
 		md.update(text.getBytes("iso-8859-1"), 0, text.length());
 		byte[] sha1hash = md.digest();

@@ -31,7 +31,7 @@ public class Charts implements Serializable {
 	LineChartModel dateModel;
 
 	@Inject
-	Results results;
+	Ranking ranking;
 
 	@Inject
 	AuthorizationBean authBean;
@@ -52,7 +52,7 @@ public class Charts implements Serializable {
 
 	private void createDateModel() {
 		dateModel = new LineChartModel();
-		Set<Map.Entry<User, Map<String, Integer>>> eloSet = results
+		Set<Map.Entry<User, Map<String, Integer>>> eloSet = ranking
 				.getEloDaily().entrySet();
 		List<Map.Entry<User, Map<String, Integer>>> eloList = new ArrayList<Map.Entry<User, Map<String, Integer>>>(
 				eloSet);
