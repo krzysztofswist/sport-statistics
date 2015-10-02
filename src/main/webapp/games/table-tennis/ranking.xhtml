@@ -11,8 +11,11 @@
 		<h:form id="rankingForm">
 			<p:growl id="growlId" showDetail="false"></p:growl>
 
-			<h1>Ranking</h1>
-<p:chart type="line" model="#{charts.dateModel}" style="height:400px;"/>
+
+			<p:chart type="line" model="#{charts.dateModel}"
+				 responsive="true"/>
+			<p:chart type="bar" model="#{charts.horizontalBarChartModel}"
+				 responsive="true"/>
 		</h:form>
 
 	</ui:define>

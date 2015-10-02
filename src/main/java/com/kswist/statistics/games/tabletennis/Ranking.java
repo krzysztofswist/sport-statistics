@@ -42,7 +42,7 @@ public class Ranking implements Serializable {
 	@PostConstruct
 	public void init() {
 		users = userDAO.getAll();
-		results=resultDAO.getAllDesc();
+		results = resultDAO.getAllDesc();
 		calculateRanking(results);
 	}
 
@@ -54,7 +54,7 @@ public class Ranking implements Serializable {
 		prepareInitialElo();
 		int K = 32;
 		Calendar start = Calendar.getInstance();
-		start.setTime(results.get(results.size()-1).getDate());
+		start.setTime(results.get(results.size() - 1).getDate());
 		Calendar end = Calendar.getInstance();
 		end.setTime(new Date());
 		end.add(Calendar.DATE, 1);
@@ -74,10 +74,12 @@ public class Ranking implements Serializable {
 				double userES = calculateExpectedScore(userElo, opponentElo);
 				double opponentES = calculateExpectedScore(opponentElo,
 						userElo);
-				int userS = (result.getUserPoints() > result
-						.getOpponentPoints()) ? 1 : 0;
-				int opponentS = (result.getOpponentPoints() > result
-						.getUserPoints()) ? 1 : 0;
+				double userS = (result.getUserPoints() > result
+						.getOpponentPoints()) ? 1
+								: 0.75 * result.getUserPoints() / 3;
+				double opponentS = (result.getOpponentPoints() > result
+						.getUserPoints()) ? 1
+								: 0.75 * result.getOpponentPoints() / 3;
 				int userEloNew = (int) (userElo + K * (userS - userES));
 				int opponentEloNew = (int) (opponentElo
 						+ K * (opponentS - opponentES));
@@ -150,8 +152,8 @@ public class Ranking implements Serializable {
 			resultDay.set(Calendar.MINUTE, 0);
 			resultDay.set(Calendar.SECOND, 0);
 			resultDay.set(Calendar.MILLISECOND, 0);
-			logger.debug("Requested date: " + requestedDay.getTime());
-			logger.debug("Result date: " + resultDay.getTime());
+			logger.trace("Requested date: " + requestedDay.getTime());
+			logger.trace("Result date: " + resultDay.getTime());
 			if (requestedDay.getTime().equals(resultDay.getTime())) {
 				logger.debug(resultDay.getTime() + "equal to "
 						+ requestedDay.getTime());
