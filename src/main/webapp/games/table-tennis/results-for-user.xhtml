@@ -30,6 +30,19 @@
 
 ></p:dataTable>
 
+			<p:dataTable id="matchPerUserTable" var="disp"
+				value="#{resultsForUser.getMatchPerUser()}" resizableColumns="false"
+				emptyMessage="NO RESULTS FOUND">
+
+				<p:column headerText="Opponent">
+					<h:link value="#{disp.key.firstName} #{disp.key.lastName}"
+						outcome="/games/table-tennis/results-for-user.jsf?login=#{disp.key.login}" />
+				</p:column>
+				<p:column headerText="Matches played">
+					<p:outputLabel value="#{disp.value}"></p:outputLabel>
+				</p:column>
+
+></p:dataTable>
 
 		</h:form>
 

@@ -50,9 +50,12 @@ public class Ranking implements Serializable {
 		return eloDaily;
 	}
 
+	public void setEloDaily(Map<User, Map<String, Integer>> eloDaily) {
+		this.eloDaily = eloDaily;
+	}
+
 	private void calculateRanking(List<Result> results) {
 		prepareInitialElo();
-		int K = 32;
 		Calendar start = Calendar.getInstance();
 		start.setTime(results.get(results.size() - 1).getDate());
 		Calendar end = Calendar.getInstance();
@@ -63,37 +66,49 @@ public class Ranking implements Serializable {
 				.add(Calendar.DATE, 1), d = start.getTime()) {
 			handleDate(d);
 			for (Result result : getResultsForDate(d)) {
-				String date = formatDate(result.getDate());
-				logger.debug(date);
-				User user = result.getUser();
-				User opponent = result.getOpponent();
-				Map<String, Integer> userMap = eloDaily.get(user);
-				Map<String, Integer> opponentMap = eloDaily.get(opponent);
-				int userElo = userMap.get(date);
-				int opponentElo = opponentMap.get(date);
-				double userES = calculateExpectedScore(userElo, opponentElo);
-				double opponentES = calculateExpectedScore(opponentElo,
-						userElo);
-				double userS = (result.getUserPoints() > result
-						.getOpponentPoints()) ? 1
-								: 0.75 * result.getUserPoints() / 3;
-				double opponentS = (result.getOpponentPoints() > result
-						.getUserPoints()) ? 1
-								: 0.75 * result.getOpponentPoints() / 3;
-				int userEloNew = (int) (userElo + K * (userS - userES));
-				int opponentEloNew = (int) (opponentElo
-						+ K * (opponentS - opponentES));
-				userMap.put(date, userEloNew);
-				opponentMap.put(date, opponentEloNew);
-				logger.debug(user.getLogin() + " ES: " + userES);
-				logger.debug(user.getLogin() + " S: " + userS);
-				logger.debug(user.getLogin() + " ELO: " + userEloNew);
-				logger.debug(opponent.getLogin() + " ES: " + opponentES);
-				logger.debug(opponent.getLogin() + " S: " + opponentS);
-				logger.debug(opponent.getLogin() + " ELO: " + opponentEloNew);
+				calculateNewElo(result);
 			}
 		}
 
+	}
+
+	private double calculateScore(int pointsScored, int pointsLoosed) {
+		return (pointsScored > pointsLoosed) ? 1 - 0.2 * pointsLoosed / 5
+				: 0.75 * pointsScored / 5;
+	}
+
+	private int calculateNewElo(int elo, int K, double S, double ES) {
+		return (int) (elo + K * (S - ES));
+	}
+
+	private void calculateNewElo(Result result) {
+		int K = 32;
+		String date = formatDate(result.getDate());
+		logger.debug(date);
+		User user = result.getUser();
+		User opponent = result.getOpponent();
+		Map<String, Integer> userMap = eloDaily.get(user);
+		Map<String, Integer> opponentMap = eloDaily.get(opponent);
+		int userElo = userMap.get(date);
+		int opponentElo = opponentMap.get(date);
+		double userES = calculateExpectedScore(userElo, opponentElo);
+		double opponentES = calculateExpectedScore(opponentElo, userElo);
+		double userS = calculateScore(result.getUserPoints(),
+				result.getOpponentPoints());
+
+		double opponentS = calculateScore(result.getOpponentPoints(),
+				result.getUserPoints());
+		int userEloNew = calculateNewElo(userElo, K, userS, userES);
+		int opponentEloNew = calculateNewElo(opponentElo, K, opponentS,
+				opponentES);
+		userMap.put(date, userEloNew);
+		opponentMap.put(date, opponentEloNew);
+		logger.debug(user.getLogin() + " ES: " + userES);
+		logger.debug(user.getLogin() + " S: " + userS);
+		logger.debug(user.getLogin() + " ELO: " + userEloNew);
+		logger.debug(opponent.getLogin() + " ES: " + opponentES);
+		logger.debug(opponent.getLogin() + " S: " + opponentS);
+		logger.debug(opponent.getLogin() + " ELO: " + opponentEloNew);
 	}
 
 	private void handleDate(Date date) {

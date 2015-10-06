@@ -2,7 +2,10 @@ package com.kswist.statistics.games.tabletennis;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.enterprise.context.RequestScoped;
 import javax.faces.context.FacesContext;
@@ -24,12 +27,14 @@ public class ResultsForUser implements Serializable {
 
 	@Inject
 	ResultDAO resultDAO;
-	
+
 	@Inject
 	UserDAO userDAO;
 
 	@Inject
 	FacesContext context;
+
+	List<Result> results;
 
 	private void addCorrectResult(List<Result> list, Result result) {
 		Result newResult = new Result();
@@ -53,7 +58,7 @@ public class ResultsForUser implements Serializable {
 	}
 
 	private List<Result> getResultsByUsers(User user) {
-		List<Result> results = new ArrayList<Result>();
+		results = new ArrayList<Result>();
 		List<Result> userResults = resultDAO.getUserResults(user);
 		for (Result result : userResults) {
 			if (result.getUser().equals(user)) {
@@ -64,6 +69,20 @@ public class ResultsForUser implements Serializable {
 			}
 		}
 		return results;
+	}
+
+	public List<Map.Entry<User, Integer>> getMatchPerUser() {
+		Map<User, Integer> map = new HashMap<User, Integer>();
+		for (Result result : results) {
+			User opponent = result.getOpponent();
+			if (map.get(opponent) == null) {
+				map.put(opponent, 1);
+			} else {
+				map.put(opponent, map.get(opponent) + 1);
+			}
+		}
+		Set<Map.Entry<User, Integer>> set = map.entrySet();
+		return new ArrayList<Map.Entry<User, Integer>>(set);
 	}
 
 }
