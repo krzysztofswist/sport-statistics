@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
@@ -25,6 +26,8 @@ public class ResultsForUser implements Serializable {
 	private static final Logger logger = Logger.getLogger(ResultsForUser.class);
 	private static final long serialVersionUID = 3471360120995793458L;
 
+	List<Result> resultsByUser;
+
 	@Inject
 	ResultDAO resultDAO;
 
@@ -35,6 +38,11 @@ public class ResultsForUser implements Serializable {
 	FacesContext context;
 
 	List<Result> results;
+
+	@PostConstruct
+	private void init() {
+		resultsByUser = generateResultsByUser();
+	}
 
 	private void addCorrectResult(List<Result> list, Result result) {
 		Result newResult = new Result();
@@ -49,12 +57,20 @@ public class ResultsForUser implements Serializable {
 		list.add(newResult);
 	}
 
-	public List<Result> getResultsByUser() {
+	public List<Result> generateResultsByUser() {
 		String login = context.getExternalContext().getRequestParameterMap()
 				.get("login");
 		User user = userDAO.getByLogin(login);
 		logger.debug("Geting results for user: " + login);
 		return getResultsByUsers(user);
+	}
+
+	public List<Result> getResultsByUser() {
+		return resultsByUser;
+	}
+
+	public void setResultsByUser(List<Result> resultsByUser) {
+		this.resultsByUser = resultsByUser;
 	}
 
 	private List<Result> getResultsByUsers(User user) {

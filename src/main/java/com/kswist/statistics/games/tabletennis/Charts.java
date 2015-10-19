@@ -78,6 +78,8 @@ public class Charts implements Serializable {
 		List<Map.Entry<User, Map<String, Integer>>> eloList = new ArrayList<Map.Entry<User, Map<String, Integer>>>(
 				eloSet);
 		Collections.sort(eloList, new ValueComparator());
+		prepareList(eloList);
+
 		for (Map.Entry<User, Map<String, Integer>> dailyElo : eloList) {
 
 			LineChartSeries serie = new LineChartSeries();
@@ -102,6 +104,41 @@ public class Charts implements Serializable {
 
 		dateModel.setTitle("Ranking ELO history");
 		dateModel.setLegendPosition("nw");
+
+	}
+
+	private void prepareList(List<Map.Entry<User, Map<String, Integer>>> list) {
+		List<String> dates = new ArrayList<String>(
+				list.get(0).getValue().keySet());
+		String previousDate = null;
+		for (String date : dates) {
+			if (previousDate == null) {
+				previousDate = date;
+				continue;
+			}
+			boolean same = true;
+			for (int i = 0; i < list.size(); i++) {
+				Integer valueToday = list.get(i).getValue().get(date);
+				Integer valueYesterday = list.get(i).getValue()
+						.get(previousDate);
+				logger.debug("Value today:" + valueToday);
+				logger.debug("Value yesterday: " + valueYesterday);
+				if (!valueToday.equals(valueYesterday)) {
+					logger.debug("Values are the same");
+					same = false;
+					break;
+				}
+			}
+			if (same) {
+				for (int i = 0; i < list.size(); i++) {
+					list.get(i).getValue().remove(date);
+				}
+				
+			}else{
+				previousDate=date;
+			}
+			
+		}
 
 	}
 
